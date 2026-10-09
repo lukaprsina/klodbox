@@ -1,0 +1,40 @@
+{
+  "theme": "dark",
+  "autoUpdatesChannel": "latest",
+
+  "promptCacheTtl": "5m",
+
+  "syncClaudeAiSkills": false,
+  "syncClaudeAiPlugins": false,
+  "disableClaudeAiConnectors": true,
+  "disableBundledSkills": true,
+  "disableWorkflows": true,
+  "disableArtifact": true,
+  "disableRemoteControl": true,
+
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "deny": [
+      "AskUserQuestion",
+      "EnterPlanMode",
+      "ExitPlanMode",
+      "NotebookEdit",
+      "DesignSync",
+      "ReportFindings",
+      "SendMessage",
+      "PushNotification",
+      "RemoteTrigger",
+      "ScheduleWakeup",
+      "CronCreate",
+      "CronDelete",
+      "CronList"
+    ]
+  },
+  "skipDangerousModePermissionPrompt": true,
+
+  "statusLine": {
+    "type": "command",
+    "command": "~/.cargo/bin/claude-statusline",
+    "refreshInterval": 1
+  }
+}
