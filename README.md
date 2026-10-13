@@ -20,7 +20,7 @@ What it does **not** do (see [Anthropic's guidance](https://code.claude.com/docs
 
 - **Always:** Claude Code (native install, updates with `claude upgrade`), [claude-statusline](https://github.com/lukaprsina/claude-statusline), `gh`, `tmux`, `jq`, `ripgrep`, `fd`, `bat`, `build-essential`.
 - **On by default** (the `TOOLS` array in `.devcontainer/install.sh`): [vite-plus](https://vite.plus) (manages Node), [opencode](https://opencode.ai), [yazi](https://yazi-rs.github.io), neovim, [flyline](https://github.com/HalFrgrd/flyline) (readline replacement), [uv](https://docs.astral.sh/uv/).
-- **Off by default:** `rust` (nightly). Uncomment it in `TOOLS`.
+- **Off by default:** `rust` (nightly) and [`kache`](https://github.com/kunobi-ninja/kache) (compiler cache, enable after `rust`). Uncomment them in `TOOLS`.
 - Claude settings from `.devcontainer/claude_settings.json`, shell setup from `.devcontainer/container.bashrc`.
 
 ## Setup
@@ -76,6 +76,7 @@ Removing `claude-code-config` signs you out and `gh-config` drops the `gh` login
 - **Installers fetch `latest`.** Nothing is pinned, so two builds on different days can differ.
 - **Claude settings are overwritten.** `install.sh` copies `claude_settings.json` over `~/.claude/settings.json` on every create. Edit the repo file, not the one in the container.
 - **Skills are manual.** Install them inside the container after the first build.
+- **kache copies by default.** Its store (`~/.cache/kache`) is on the container's overlay filesystem, the project is a bind mount, and links can't cross mounts, so restores are copies. You still skip the compile, you just don't save disk. See `kache doctor`. Sharing the store with the host would let the container write to your host's cache, so it isn't set up here.
 - **Shared volumes:** two containers running `install.sh` at once can trip over each other in `~/.cargo`.
 - **Line endings:** `.gitattributes` forces LF so `install.sh` works from a Windows checkout.
 

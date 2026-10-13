@@ -12,6 +12,7 @@ TOOLS=(
     flyline
     uv
     # rust
+    # kache  # Rust/C++ compiler cache; needs rust
 )
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -33,6 +34,16 @@ apt_yazi() {
 
 apt_neovim() { APT_PKGS+=(neovim); }
 
+apt_kache() {
+    if [ ! -f /etc/apt/sources.list.d/kache.list ]; then
+        sudo mkdir -p /etc/apt/keyrings
+        curl -fsSL https://r2.kunobi.com/kache/apt/gpg.key | sudo gpg --dearmor --yes -o /etc/apt/keyrings/kache.gpg
+        echo 'deb [signed-by=/etc/apt/keyrings/kache.gpg] https://r2.kunobi.com/kache/apt stable main' \
+            | sudo tee /etc/apt/sources.list.d/kache.list >/dev/null
+    fi
+    APT_PKGS+=(kache)
+}
+
 # VP_NODE_MANAGER must be set on the bash side of the pipe, or the installer asks.
 install_vite-plus() { curl -fsSL https://vite.plus | VP_NODE_MANAGER=yes bash; }
 install_opencode() { curl -fsSL https://opencode.ai/v2/install | bash; }
@@ -50,6 +61,9 @@ install_rust() {
             | sh -s -- -y --profile default --default-toolchain nightly -c rust-analyzer -c rust-src
     fi
 }
+
+# Writes rustc-wrapper into ~/.cargo/config.toml (cargo-home volume). No systemd in the container, so no login service.
+install_kache() { kache init --yes --no-service --no-shell; }
 
 install_claude-code() { curl -fsSL https://claude.ai/install.sh | bash; }
 
