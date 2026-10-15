@@ -42,7 +42,7 @@ You need [VS Code](https://code.visualstudio.com) with the [Dev Containers](http
 
 ## Choosing tools
 
-Edit `TOOLS` at the top of `.devcontainer/install.sh`: one name per line, comment a line out to skip it. Each tool is an `apt_<name>` and/or `install_<name>` function, so adding one is a few lines.
+Edit `TOOLS` at the top of `.devcontainer/install.sh`: one name per line, comment a line out to skip it. Each tool is a `repo_<name>` function (apt repository), a `PKGS_<name>` array (apt packages) and/or an `install_<name>` function, so adding one is a few lines.
 
 - **Apply changes without rebuilding:** `bash .devcontainer/install.sh` (safe to re-run).
 - **Rebuild:** **Dev Containers: Rebuild Container** after changing `devcontainer.json`.
