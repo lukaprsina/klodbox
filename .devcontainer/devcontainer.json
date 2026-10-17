@@ -1,7 +1,8 @@
 {
     "name": "klodbox",
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu-26.04",
     "remoteUser": "vscode",
+    "init": true,
     "features": {
         "ghcr.io/devcontainers/features/github-cli:1": {}
     },
@@ -13,6 +14,8 @@
         "source=gh-config,target=/home/vscode/.config/gh,type=volume",
         "source=cargo-home,target=/home/vscode/.cargo,type=volume",
         "source=rustup-home,target=/home/vscode/.rustup,type=volume",
+        "source=local-home,target=/home/vscode/.local,type=volume",
+        "source=opencode-home,target=/home/vscode/.opencode,type=volume",
         "source=shell-history-${devcontainerId},target=/commandhistory,type=volume"
     ],
     "postCreateCommand": "bash .devcontainer/install.sh"

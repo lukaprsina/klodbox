@@ -97,10 +97,10 @@ for tool in "${TOOLS[@]}"; do
 done
 
 log "Volume ownership"
-mkdir -p ~/.claude ~/.config/gh ~/.cargo ~/.rustup
+mkdir -p ~/.claude ~/.config/gh ~/.cargo ~/.rustup ~/.local ~/.opencode
 sudo mkdir -p /commandhistory
 # Top level only: volume roots mount root-owned; -R would walk the whole cargo/rustup trees on every rebuild.
-sudo chown "$(id -u):$(id -g)" ~/.claude ~/.config/gh ~/.cargo ~/.rustup /commandhistory
+sudo chown "$(id -u):$(id -g)" ~/.claude ~/.config/gh ~/.cargo ~/.rustup ~/.local ~/.opencode /commandhistory
 touch /commandhistory/.bash_history
 
 export DEBIAN_FRONTEND=noninteractive
@@ -146,7 +146,7 @@ grep -qF 'container.bashrc' ~/.bashrc 2>/dev/null \
     || echo "[ -f \"$DIR/container.bashrc\" ] && . \"$DIR/container.bashrc\"" >> ~/.bashrc
 
 if [ "${#FAILED[@]}" -gt 0 ]; then
-    printf '\n!! Failed: %s\n' "${FAILED[*]}" >&2
-    exit 1
+    # Warn but exit 0: a nonzero postCreateCommand makes VS Code show a failed-container prompt for a mostly usable box.
+    printf '\n!! Failed: %s (re-run: bash .devcontainer/install.sh)\n' "${FAILED[*]}" >&2
 fi
 log "Done"
