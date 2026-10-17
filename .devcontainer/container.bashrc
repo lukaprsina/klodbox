@@ -2,6 +2,8 @@
 
 if command -v nvim >/dev/null; then export EDITOR=nvim; else export EDITOR=vi; fi
 alias r='exec bash'
+# Survives dropped connections; run again after a drop to re-attach.
+alias c='shpool attach -f claude'
 
 # Shell history lives in a volume so it survives rebuilds.
 export HISTFILE=/commandhistory/.bash_history

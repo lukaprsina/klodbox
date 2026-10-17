@@ -39,6 +39,12 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
      | sh -s -- -y --profile default --default-toolchain nightly -c rust-analyzer -c rust-src \
      && kache init --yes --no-service --no-shell
 
+# cargo-binstall fetches prebuilt binaries (falls back to compiling). cargo-update gives `cargo install-update -a`.
+# shpool keeps terminal sessions alive across dropped connections; its daemon autostarts, no systemd needed.
+RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash \
+     && cargo binstall --no-confirm cargo-update
+RUN cargo binstall --no-confirm shpool
+
 # Unpinned `latest`: a rebuild without cache picks up new versions.
 # VP_NODE_MANAGER must be set on the bash side of the pipe, or the installer asks.
 RUN curl -fsSL https://vite.plus | VP_NODE_MANAGER=yes bash

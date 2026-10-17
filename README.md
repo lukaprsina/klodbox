@@ -19,7 +19,7 @@ What it does **not** do (see [Anthropic's guidance](https://code.claude.com/docs
 ## What you get
 
 - **Always:** Claude Code (native install, updates with `claude upgrade`), [claude-statusline](https://github.com/lukaprsina/claude-statusline), `gh`, `tmux`, `jq`, `ripgrep`, `fd`, `bat`, `build-essential`.
-- **Also installed** (in `.devcontainer/Dockerfile`): [vite-plus](https://vite.plus) (manages Node), [opencode](https://opencode.ai), [yazi](https://yazi-rs.github.io), neovim, [flyline](https://github.com/HalFrgrd/flyline) (readline replacement), [uv](https://docs.astral.sh/uv/), Rust nightly and [`kache`](https://github.com/kunobi-ninja/kache) (compiler cache).
+- **Also installed** (in `.devcontainer/Dockerfile`): [shpool](https://github.com/shell-pool/shpool) (via [cargo-binstall](https://github.com/cargo-bins/cargo-binstall), with `cargo-update`), [vite-plus](https://vite.plus) (manages Node), [opencode](https://opencode.ai), [yazi](https://yazi-rs.github.io), neovim, [flyline](https://github.com/HalFrgrd/flyline) (readline replacement), [uv](https://docs.astral.sh/uv/), Rust nightly and [`kache`](https://github.com/kunobi-ninja/kache) (compiler cache).
 - Claude settings from `.devcontainer/claude_settings.json`, shell setup from `.devcontainer/container.bashrc`.
 
 ## Setup
@@ -39,6 +39,16 @@ You need [VS Code](https://code.visualstudio.com) with the [Dev Containers](http
 3. In VS Code: **Dev Containers: Reopen in Container**. The first build takes a few minutes.
 4. First time only, inside the container: run `claude` and sign in, then `gh auth login` (accept the git setup prompt). Both survive rebuilds.
 
+## Surviving dropped connections
+
+Claude Code dies when its terminal does, which happens when Remote-SSH drops. Run it inside a [shpool](https://github.com/shell-pool/shpool) session instead:
+
+```sh
+c           # alias for: shpool attach -f claude
+claude
+```
+
+After a drop, open a terminal and run `c` again; the session and the running agent are still there. Detach with `Ctrl-Space Ctrl-q`. Closing the VS Code window still stops the container (and the session with it); only a dropped connection is survived.
 ## Choosing tools
 
 Tools are `RUN` lines in `.devcontainer/Dockerfile`: delete a line to skip a tool, add one to install another. Apt packages go in the big `apt-get install` block at the top.
