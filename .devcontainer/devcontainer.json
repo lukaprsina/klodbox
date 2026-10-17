@@ -1,6 +1,9 @@
 {
     "name": "klodbox",
-    "build": { "dockerfile": "Dockerfile", "context": "." },
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
     "remoteUser": "vscode",
     "init": true,
     "features": {

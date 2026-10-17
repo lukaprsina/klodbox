@@ -43,7 +43,8 @@ You need [VS Code](https://code.visualstudio.com) with the [Dev Containers](http
 
 Tools are `RUN` lines in `.devcontainer/Dockerfile`: delete a line to skip a tool, add one to install another. Apt packages go in the big `apt-get install` block at the top.
 
-- **Rebuild:** **Dev Containers: Rebuild Container** after any change to the Dockerfile or `devcontainer.json`. Unchanged layers come from cache; use **Rebuild Without Cache** to pick up new `latest` versions.
+- **Rebuild:** **Dev Containers: Rebuild Container** after any change to the Dockerfile or `devcontainer.json`. VS Code builds the image itself, so there is nothing else to run. Unchanged layers come from cache; use **Rebuild Without Cache** to pick up new `latest` versions.
+- **Build by hand (optional):** to see build errors faster than a full rebuild, run `docker build -f .devcontainer/Dockerfile .devcontainer` (or `podman build ...`) from the host. Podman warns that `SHELL` isn't persisted in OCI format; it's harmless, and `--format docker` silences it.
 - `.devcontainer/install.sh` only runs on create: volume ownership, the Claude settings seed and the shell hook. Re-run it with `bash .devcontainer/install.sh` (safe).
 - Editing `container.bashrc` needs no rebuild; open a new shell.
 
