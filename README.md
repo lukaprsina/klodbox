@@ -19,8 +19,7 @@ What it does **not** do (see [Anthropic's guidance](https://code.claude.com/docs
 ## What you get
 
 - **Always:** Claude Code (native install, updates with `claude upgrade`), [claude-statusline](https://github.com/lukaprsina/claude-statusline), `gh`, `tmux`, `jq`, `ripgrep`, `fd`, `bat`, `build-essential`.
-- **On by default** (the `TOOLS` array in `.devcontainer/install.sh`): [vite-plus](https://vite.plus) (manages Node), [opencode](https://opencode.ai), [yazi](https://yazi-rs.github.io), neovim, [flyline](https://github.com/HalFrgrd/flyline) (readline replacement), [uv](https://docs.astral.sh/uv/).
-- **Off by default:** `rust` (nightly) and [`kache`](https://github.com/kunobi-ninja/kache) (compiler cache, enable after `rust`). Uncomment them in `TOOLS`.
+- **Also installed** (in `.devcontainer/Dockerfile`): [vite-plus](https://vite.plus) (manages Node), [opencode](https://opencode.ai), [yazi](https://yazi-rs.github.io), neovim, [flyline](https://github.com/HalFrgrd/flyline) (readline replacement), [uv](https://docs.astral.sh/uv/), Rust nightly and [`kache`](https://github.com/kunobi-ninja/kache) (compiler cache).
 - Claude settings from `.devcontainer/claude_settings.json`, shell setup from `.devcontainer/container.bashrc`.
 
 ## Setup
@@ -42,21 +41,22 @@ You need [VS Code](https://code.visualstudio.com) with the [Dev Containers](http
 
 ## Choosing tools
 
-Edit `TOOLS` at the top of `.devcontainer/install.sh`: one name per line, comment a line out to skip it. Each tool is a `repo_<name>` function (apt repository), a `PKGS_<name>` array (apt packages) and/or an `install_<name>` function, so adding one is a few lines.
+Tools are `RUN` lines in `.devcontainer/Dockerfile`: delete a line to skip a tool, add one to install another. Apt packages go in the big `apt-get install` block at the top.
 
-- **Apply changes without rebuilding:** `bash .devcontainer/install.sh` (safe to re-run).
-- **Rebuild:** **Dev Containers: Rebuild Container** after changing `devcontainer.json`.
-- A failing tool is logged and skipped; the script reports the failures at the end.
+- **Rebuild:** **Dev Containers: Rebuild Container** after any change to the Dockerfile or `devcontainer.json`. Unchanged layers come from cache; use **Rebuild Without Cache** to pick up new `latest` versions.
+- `.devcontainer/install.sh` only runs on create: volume ownership, the Claude settings seed and the shell hook. Re-run it with `bash .devcontainer/install.sh` (safe).
+- Editing `container.bashrc` needs no rebuild; open a new shell.
 
 ## Volumes
 
-These persist across rebuilds, so installs are mostly updates:
+Only data lives in volumes; tools are in the image. They persist across rebuilds:
 
 | Volume | Mounted at | Shared by all projects |
 |---|---|---|
 | `claude-code-config` | `~/.claude` | yes |
 | `gh-config` | `~/.config/gh` | yes |
-| `cargo-home`, `rustup-home` | `~/.cargo`, `~/.rustup` | yes |
+| `kache-cache` | `~/.cache/kache` | yes |
+| `cargo-registry`, `cargo-git` | `~/.cargo/registry`, `~/.cargo/git` | yes |
 | `shell-history-<id>` | `/commandhistory` | per project |
 
 Start clean (use `podman` instead of `docker` if that's your engine):
@@ -65,7 +65,7 @@ Start clean (use `podman` instead of `docker` if that's your engine):
 docker ps -a                                  # find the container, then:
 docker rm -f <container>                      # (or "Dev Containers: Rebuild Without Cache")
 docker volume ls                              # see the volumes
-docker volume rm claude-code-config gh-config cargo-home rustup-home
+docker volume rm claude-code-config gh-config kache-cache cargo-registry cargo-git
 docker volume prune                           # removes ALL unused volumes
 ```
 
@@ -73,11 +73,11 @@ Removing `claude-code-config` signs you out and `gh-config` drops the `gh` login
 
 ## Gotchas
 
-- **Installers fetch `latest`.** Nothing is pinned, so two builds on different days can differ.
-- **Claude settings are overwritten.** `install.sh` copies `claude_settings.json` over `~/.claude/settings.json` on every create. Edit the repo file, not the one in the container.
+- **Installers fetch `latest`.** Nothing is pinned, and Docker caches the layers, so the versions you get depend on when each layer was last built without cache.
+- **Claude settings are seeded once.** `install.sh` copies `claude_settings.json` to `~/.claude/settings.json` only if it doesn't exist yet. To re-seed, delete that file in the container and re-run `install.sh`.
 - **Skills are manual.** Install them inside the container after the first build.
-- **kache copies by default.** Its store (`~/.cache/kache`) is on the container's overlay filesystem, the project is a bind mount, and links can't cross mounts, so restores are copies. You still skip the compile, you just don't save disk. See `kache doctor`. Sharing the store with the host would let the container write to your host's cache, so it isn't set up here.
-- **Shared volumes:** two containers running `install.sh` at once can trip over each other in `~/.cargo`.
+- **kache and links.** Its store is a volume and the project is a bind mount. Whether restores are links, clones or copies depends on your engine and filesystem; run `kache doctor` after a build. Sharing the store with the host would let the container write to your host's cache, so it isn't set up here.
+- **Shared volumes:** two containers building at once share the cargo registry and the kache store, and can wait on each other's locks.
 - **Line endings:** `.gitattributes` forces LF so `install.sh` works from a Windows checkout.
 
 ## Links

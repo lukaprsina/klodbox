@@ -1,6 +1,6 @@
 {
     "name": "klodbox",
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu-26.04",
+    "build": { "dockerfile": "Dockerfile", "context": "." },
     "remoteUser": "vscode",
     "init": true,
     "features": {
@@ -12,10 +12,9 @@
     "mounts": [
         "source=claude-code-config,target=/home/vscode/.claude,type=volume",
         "source=gh-config,target=/home/vscode/.config/gh,type=volume",
-        "source=cargo-home,target=/home/vscode/.cargo,type=volume",
-        "source=rustup-home,target=/home/vscode/.rustup,type=volume",
-        "source=local-home,target=/home/vscode/.local,type=volume",
-        "source=opencode-home,target=/home/vscode/.opencode,type=volume",
+        "source=kache-cache,target=/home/vscode/.cache/kache,type=volume",
+        "source=cargo-registry,target=/home/vscode/.cargo/registry,type=volume",
+        "source=cargo-git,target=/home/vscode/.cargo/git,type=volume",
         "source=shell-history-${devcontainerId},target=/commandhistory,type=volume"
     ],
     "postCreateCommand": "bash .devcontainer/install.sh"
