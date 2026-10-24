@@ -21,7 +21,7 @@ RUN apt-get update \
      > /etc/apt/sources.list.d/kache.list \
      && apt-get update \
      && apt-get install -y --no-install-recommends \
-     build-essential file unzip jq tmux ripgrep fd-find bat python-is-python3 \
+     build-essential file unzip jq tmux ripgrep fd-find bat python-is-python3 xclip \
      neovim yazi ffmpeg 7zip poppler-utils imagemagick resvg \
      kache \
      && ln -sf /usr/bin/fdfind /usr/local/bin/fd \
