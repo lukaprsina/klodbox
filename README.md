@@ -18,9 +18,9 @@ What it does **not** do (see [Anthropic's guidance](https://code.claude.com/docs
 
 ## What you get
 
-- **Always:** Claude Code (native install, updates with `claude upgrade`), [claude-statusline](https://github.com/lukaprsina/claude-statusline), `gh`, `tmux`, `jq`, `ripgrep`, `fd`, `bat`, `build-essential`.
+- **Always:** Claude Code (native install, updates with `claude upgrade`), [claude-statusline](https://github.com/lukaprsina/claude-statusline), `gh`, `tmux`, `jq`, `ripgrep`, `fd`, `bat`, `build-essential`, the [fff](https://github.com/dmtrKovalenko/fff) MCP server (file search) and the Exa plugin (web search).
 - **Also installed** (in `.devcontainer/Dockerfile`): [shpool](https://github.com/shell-pool/shpool) (via [cargo-binstall](https://github.com/cargo-bins/cargo-binstall), with `cargo-update`), [vite-plus](https://vite.plus) (manages Node), [opencode](https://opencode.ai), [yazi](https://yazi-rs.github.io), neovim, [flyline](https://github.com/HalFrgrd/flyline) (readline replacement), [uv](https://docs.astral.sh/uv/), Rust nightly and [`kache`](https://github.com/kunobi-ninja/kache) (compiler cache).
-- Claude settings from `.devcontainer/claude_settings.json`, shell setup from `.devcontainer/container.bashrc`.
+- Claude settings from `.devcontainer/claude_settings.json` and global instructions from `.devcontainer/CLAUDE.md` (tell Claude to use fff and Exa), shell setup from `.devcontainer/container.bashrc`.
 
 ## Setup
 
@@ -80,12 +80,12 @@ docker volume rm claude-code-config gh-config kache-cache cargo-registry cargo-g
 docker volume prune                           # removes ALL unused volumes
 ```
 
-Removing `claude-code-config` signs you out and `gh-config` drops the `gh` login. Claude settings are re-copied from the repo on the next create.
+Removing `claude-code-config` signs you out and `gh-config` drops the `gh` login. Claude settings and `CLAUDE.md` are re-copied from the repo on the next create.
 
 ## Gotchas
 
 - **Installers fetch `latest`.** Nothing is pinned, and Docker caches the layers, so the versions you get depend on when each layer was last built without cache.
-- **Claude settings are seeded once.** `install.sh` copies `claude_settings.json` to `~/.claude/settings.json` only if it doesn't exist yet. To re-seed, delete that file in the container and re-run `install.sh`.
+- **Claude settings are seeded once.** `install.sh` copies `claude_settings.json` to `~/.claude/settings.json` and `CLAUDE.md` to `~/.claude/CLAUDE.md` only if they don't exist yet. To re-seed, delete the file in the container and re-run `install.sh`. The fff MCP registration and Exa plugin install are also done there, and skipped once present.
 - **Skills are manual.** Install them inside the container after the first build.
 - **kache and links.** Its store is a volume and the project is a bind mount. Whether restores are links, clones or copies depends on your engine and filesystem; run `kache doctor` after a build. Sharing the store with the host would let the container write to your host's cache, so it isn't set up here.
 - **Shared volumes:** two containers building at once share the cargo registry and the kache store, and can wait on each other's locks.

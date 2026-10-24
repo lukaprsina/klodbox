@@ -52,6 +52,8 @@ RUN curl -fsSL https://opencode.ai/v2/install | bash
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 RUN bash <(curl -sSfL https://github.com/HalFrgrd/flyline/releases/latest/download/install.sh)
 RUN curl -fsSL https://claude.ai/install.sh | bash
+# Installs fff-mcp to ~/.local/bin; install.sh registers it with Claude.
+RUN curl -fsSL https://dmtrkovalenko.dev/install-fff-mcp.sh | bash
 # Installs to ~/.cargo/bin; claude_settings.json points at it.
 RUN curl --proto '=https' --tlsv1.2 -LsSf \
      https://github.com/lukaprsina/claude-statusline/releases/latest/download/claude-statusline-installer.sh | sh
